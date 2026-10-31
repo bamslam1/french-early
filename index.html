@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="google" content="notranslate">
+    <title>FrançaisFlash</title>
+    <link rel="stylesheet" href="Styles/style.css">
+    <link id="favicon" rel="icon" type="image/png" href="Images/favicon-icon.ico" size="any">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <noscript>
+  <p>
+    <strong>JavaScript is required.</strong> This site requires JavaScript to run.
+    Please enable it in your browser settings, then reload the page.
+    If the problem persists, try a current version of a modern browser such as
+    <a href="https://www.google.com/chrome/" target="_blank" rel="noopener noreferrer">Google Chrome</a>.
+    If the problem persists after updating to the newest version, please visit
+    <a href="https://github.com/bamslam1/French/issues">https://github.com/bamslam1/French/issues</a> to report a bug.
+  </p>
+    </noscript>
+    <img src="https://ps.w.org/svisciano-light-dark-theme-mode/assets/icon-256x256.png?rev=3535289" onclick="isDark = !isDark; applyTheme();" alt="Change Theme Button" class="theme-button" tabindex="0" onkeypress="if (event.key === 'Enter') {isDark = !isDark; applyTheme();};">
+
+    <!--<div class="scoreGroup transitionOut" onmouseenter="mouseIn = true; setTimeout(() => {}, 3000); if (mouseIn === true) {startFade(this, 2000);};" onmouseleave="mouseIn = false; this.classList.remove('hidden');">-->
+    <p class="score">Loading...</p>
+    <button class="reset-score" onclick="score.wins = 0; score.losses = 0; updateScore();">Reset Score</button>
+    <button class="reset-score2" onclick="resetAllScore();">Reset All Score</button>
+    <a href="https://github.com/bamslam1/French/issues" target="_blank" rel="noopener noreferer" class="bott-right"><button title="Press new issue to create a report">Report A Bug</button></a>
+    <p id="error" hidden>Error</p>
+    <p class="ver">v10.6.5</p>
+    <main>
+      <div id="startScreen">
+        <h1 class="title">FrançaisFlash</h1>
+        <p>
+          This game is designed to help you practice your French skills by providing a French phrase or word and you answer them in the input field. Your score is saved by each gamemode. Reloading the site will bring your most recently played gamemode's score up. Reloading the site will not result in a free phrase reroll (Patched in <a href="https://github.com/bamslam1/French/releases#release-v5.2.3" target="_blank" rel="noopener noreferer">v5.2.3</a>).<br><br>Please note that rerolling the phrase will take off one point.
+        </p>
+        <a href="https://bamslam1.github.io/my-projects" target="_blank" rel="noopener noreferer"><button>Other Projects</button></a>
+        <button data-page="game" onclick="pressedStartCount++; gamemode();">Start Game</button>
+        <br><br>
+        <button class="abtErrors" onclick="showAbtErrors();">More About Errors</button>
+        <button onclick="showBugs();">Known Bugs</button>
+      </div>
+
+      <div id="gamemode" hidden>
+        <button onclick="showStartScreen();">Back</button>
+        <h1>Choose Gamemode</h1>
+        <button onclick="startGame('easy');">Easy</button>
+        <button onclick="startGame('medium');">Medium</button>
+        <button onclick="startGame('hard');">Hard</button>
+        <button onclick="startGame('all');">All</button>
+        <button onclick="startGame('blitz');">Blitz</button>
+        <button onclick="if (customPhrases === allPhrases) {custom();} else if (customPhrases.length === 0) {console.warn('Cannot Play With No Phrases'); custom();} else {startGame('custom');};">Custom</button>
+        <br><br>
+        <h2>Limited Time</h1>
+        <button onclick="startGame('seasonal');" title="This gamemode will be removed at November 1st">👻 Halloween 👻</button>
+        <br><br>
+        <div class="listenOnly">
+          <input type="checkbox" class="listenOnly" id="listenOnlyCheckbox">
+          <label class="listenOnly" onclick="document.getElementById('listenOnlyCheckbox').checked = !document.getElementById('listenOnlyCheckbox').checked;">Listen Only</label>
+        </div>
+        <br><br>
+        <p class="allScore space"></p>
+        <button class="reset-score-gamemode" onclick="resetAllScore();">Reset All Score</button>
+      </div>
+
+      <div id="game" hidden>
+        <img src="Images/halloween-overlay.png" class="overlay" id="overlay" hidden>
+        <img src="Images/halloween-overlay-vertical.png" class="overlay" id="overlay-v" hidden>
+        <button type="game" class="back" onclick="stopBgm(); gamemode();">Back</button>
+        <button type="game" id="mute" onclick="toggleMute();">🔊</button>
+        <p id="timer-display">loading...</p>
+        <span lang="fr" translate="no"><p class="phrase">
+        Loading...
+        </p>
+        <div class="listenControls">
+        <button type="game" id="speech" onclick="speak();">🔊 Listen</button>
+        <input type="range" id="speechRate" name="volume" min="1" max="20">
+        <label id="displayRate"></label></div></span>
+        <br><br>
+        <div class="answer-row">
+        <input type="text" id="userInput" placeholder="Type english here" onkeypress="if(event.key === 'Enter') checkAnswer();"/>
+        <button type="game" class="submit" onclick="checkAnswer();">Submit</button>
+        <button type="game" class="reroll" onclick="reroll(false);">Reroll</button>
+        <button type="game" onclick="custom();">Edit Phrases</button>
+        </div>
+      </div>
+
+      <div id="custom" hidden>
+        <button class="back" onclick="gamemode();">Back</button>
+        <br><br>
+        <input type="text" placeholder="French Here" id="frenchCustom" onkeypress="if(event.key === 'Enter') document.getElementById('englishCustom').focus();">
+        <input type="text" placeholder="English Here" id="englishCustom" onkeydown="
+        if(event.key === 'Enter') {addToCustom();} else if (event.key === 'Backspace' && document.getElementById('englishCustom').value === '') {document.getElementById('frenchCustom').focus();}">
+        <button onclick="addToCustom();">Add</button>
+        <br><br>
+        <button onclick="if (customPhrases === allPhrases) {custom();} else if (customPhrases.length === 0) {console.warn('Cannot Play With No Phrases');} else {startGame('custom');};">Play With These Phrases</button>
+        <br><br>
+        <button class="red" onclick="removeFromList();">Remove All</button>
+        <ul id="items"></ul>
+      </div>
+
+      <div id="result" hidden>
+        <button class="back" onclick="startGame();">Back</button>
+        <img src="https://media.tenor.com/Wlu-ZlnW7QYAAAAj/no-dislike.gif" class="wrongGif" alt="Incorrect GIF" hidden>
+        <img src="Images/halloween-lose-overlay.gif" class="sznWrongGif seasonalResult transitionOut" alt="Incorrect GIF" hidden>
+
+        <img src="https://assets.dochipo.com/editor/animations/confetti/854a56df-cb2c-478c-ab6d-967ea2dee737.gif" class="rightGif" alt="Correct GIF" hidden>
+        <img src="Images/halloween-win-overlay.gif" class="sznRightGif seasonalResult transitionOut" alt="Incorrect GIF" hidden>
+        <img src="Images\halloween-overlay.png" class="overlay" id="overlay" hidden>
+        <img src="Images\halloween-overlay-vertical.png" class="overlay" id="overlay-v" hidden>
+        <p class="result-message space"></p>
+        <p class="correct-answer space"></p>
+        <button id="speech" onclick="speak();">🔊 Listen</button>
+        <button data-page="result" onclick="
+        pickPhrase(); startGame();" id="goAgain">Play Again</button>
+      </div>
+
+      <div id="abtErrors">
+        <button onclick="showStartScreen();">Back</button>
+        <p>
+          If you are experiencing an error that reads <b>"This mode is unavailable"</b> then it can mean three things,<br><b>(1) your internet is off,<br>(2) the date to play the mode has passed,<br>(3) a bug has occurred. If so, report it, even if you aren't sure.</b><br>Please note: The halloween mode only lasts until Novemeber 1st, then you will experience this error.
+          <br><br>
+          If you are experiencing an error that reads <b>"Cannot fetch date"</b> then it can mean two things,<br><b>(1) your internet is off,<br>(2) a bug has occurred. If so, report it, even if you aren't sure.</b>
+          <br><br>
+          If you are experiencing an error that reads <b>"No Phrases"</b> then it can mean one thing,
+          <br>
+          <b>a bug has occurred and JavaScript isn't assigning the phrases properly.</b>
+          <br><br>
+          If you are experiencing an error that reads <b>"Per-gamemode score setup failed: (extra error info)"</b> inside the <a href="https://google.com/search?q=web+browser+console" rel="noreferer" target="blank_" title="Click me!">console</a> then it can mean one thing,
+          <br>
+          <b>a bug has occurred when showing the score for the gamemode that you last played.</b>
+          <br><br>
+          <p>If you are experiencing an error that reads <b>"Unable to begin bgm playback"</b> this can only mean one thing,
+          <br>
+          <b>a bug has occurred in the proccess of playing the bgm file.</b></p>
+          <br><br>
+          If the game freezes, check the <a href="https://google.com/search?q=how+to+open+web+browser+console+mobile+and+desktop" rel="noreferer" target="blank_" title="Click me!">console</a> and take a screenshot or copy the text into a <a href="https://github.com/bamslam1/French/issues" rel="noreferer" target="blank_" title="Click me then press new issue to create a bug report.">bug report.</a>
+        </p>
+      </div>
+
+      <div id="bugs" hidden>
+        <button onclick="showStartScreen();">Back</button>
+        <h2>Bugs</h2>
+        <p>
+          1. Halloween effects not being applied when using listen mode.
+          <br><br>
+          2. Overlay not applying when playing the halloween mode.
+          <br><br>
+          3. Persistant loading screen when Halloween gamemode button clicked and then clicking other gamemode. This can happen if you set your wifi speed (using Chrome DevTools network tab) and quickly pressing another gamemode. Your gamemode won't get switched if this happens.
+          <br><br>
+          4. The button effects don't apply when using the halloween listen only mode.
+          <br><br>
+          <b>All of these bugs are currently being looked into and will be fixed as soon as possible.</b>
+        </p>
+      </div>
+
+      <div class="filler"></div>
+    </main>
+    <script src="Scripts/script.js" defer></script>
+  </body>
+</html>
